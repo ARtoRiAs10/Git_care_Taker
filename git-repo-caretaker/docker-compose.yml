@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  # ─── Webhook / API server ───────────────────────────────────────────────────
+  webhook:
+    build: .
+    image: git-repo-caretaker:latest
+    container_name: caretaker-webhook
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - caretaker-data:/data
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Scheduler (cron jobs) ──────────────────────────────────────────────────
+  scheduler:
+    build: .
+    image: git-repo-caretaker:latest
+    container_name: caretaker-scheduler
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - caretaker-data:/data
+    command: python scheduler.py
+    depends_on:
+      - webhook
+
+volumes:
+  caretaker-data:

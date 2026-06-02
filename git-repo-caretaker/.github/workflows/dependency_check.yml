@@ -1,0 +1,47 @@
+name: 🔍 Dependency Update Check
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (check only, no PRs)"
+        required: false
+        default: "false"
+        type: boolean
+
+jobs:
+  check-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run dependency bot
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_REPO: ${{ github.repository }}
+          OPENROUTER_MODEL: "meta-llama/llama-3.3-70b-instruct:free"
+          MAX_DEPENDENCY_PRS: "5"
+        run: |
+          DRY_RUN_FLAG=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+          python dependency_bot.py ${{ github.repository }} --branch main $DRY_RUN_FLAG

@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Git-Repo-Caretaker Configuration
+# Copy this file to config.yaml and fill in your values.
+# All values can also be overridden by environment variables.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Target GitHub repository (owner/repo-name)
+repo: "ARtorias742/openDoc_up"
+
+# Default branch to read from and create bot branches against
+branch: "main"
+
+# List of maintainer GitHub usernames for auto-assignment
+maintainers:
+  - alice
+  - bob
+
+# ─── LLM Settings ────────────────────────────────────────────────────────────
+llm:
+  # OpenRouter model to use (free models listed below)
+  # Options:
+  #   meta-llama/llama-3.3-70b-instruct:free   ← recommended (smart, free)
+  #   google/gemma-3-27b-it:free
+  #   mistralai/mistral-7b-instruct:free
+  #   meta-llama/llama-3.1-8b-instruct:free
+  model: "meta-llama/llama-3.3-70b-instruct:free"
+
+# ─── README Bot ──────────────────────────────────────────────────────────────
+readme:
+  # Similarity threshold (0.0–1.0). Below this → open a PR.
+  similarity_threshold: 0.85
+  # Auto-generate README on every push to the default branch
+  auto_on_push: false
+
+# ─── Triage Bot ──────────────────────────────────────────────────────────────
+triage:
+  # Post a first-response comment on new issues
+  post_comment: true
+  # Check for duplicate issues
+  detect_duplicates: true
+
+# ─── Dependency Bot ──────────────────────────────────────────────────────────
+dependencies:
+  # Max PRs to open per run (avoid flooding)
+  max_prs_per_run: 5
+  # Ecosystems to check
+  check_python: true
+  check_node: true
+
+# ─── Personal Assistant ───────────────────────────────────────────────────────
+digest_email: false   # set to true and configure SMTP_* env vars to email digests
+
+backup:
+  enabled: false
+  local_dir: "~/notebooks"        # local directory to back up
+  github_repo: "username/backups" # private GitHub repo for storage
+
+# ─── Schedule (cron expressions in UTC) ──────────────────────────────────────
+schedule:
+  readme_cron:  "0 6 * * *"    # README refresh — daily at 06:00 UTC
+  triage_cron:  "0 * * * *"    # Issue triage  — every hour
+  deps_cron:    "0 9 * * 1"    # Dep check     — Mondays at 09:00 UTC
+  digest_cron:  "0 8 * * *"    # To-do digest  — daily at 08:00 UTC
+  backup_cron:  "0 23 * * *"   # Backup        — daily at 23:00 UTC

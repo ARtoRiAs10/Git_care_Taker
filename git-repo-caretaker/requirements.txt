@@ -1,0 +1,27 @@
+# Git-Repo-Caretaker – Python dependencies
+
+# Web server
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# HTTP client
+requests>=2.31.0
+httpx>=0.27.0
+
+# Scheduling
+APScheduler>=3.10.4
+
+# Config
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
+
+# Logging
+loguru>=0.7.2
+
+# Data
+sqlite-utils>=3.36
+
+# Dev / testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+httpx>=0.27.0   # test client for FastAPI
